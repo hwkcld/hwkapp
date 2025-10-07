@@ -11,6 +11,7 @@ usage() {
     echo "Usage: $0 [-h] [-i image]"
     echo "  -h          Specify script is run from host"
     echo "  -i image    Specify the image name"
+    echo "  -m machine  Specify the machine name e.g. cpu1-2gb"
     echo
     exit 1
 }
@@ -23,13 +24,16 @@ fi
 # Parse command-line options
 # h - flag with no argument
 # i: - option that requires an argument (the colon means "takes a value")
-while getopts "hi:" opt; do
+while getopts "hi:m:" opt; do
     case $opt in
         h)
             HOST_MODE=true
             ;;
         i)
             IMAGE="$OPTARG"
+            ;;
+        m)
+            MACHINE="$OPTARG"
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -51,11 +55,15 @@ if [ -z "$IMAGE" ]; then
     usage
 fi
 
+if [ -z "$MACHINE" ]; then
+    echo "Error: -m machine is required" >&2
+    usage
+fi
+
 # Your script logic here
 # echo "Host: $HOST_MODE"
 # echo "Image: $IMAGE"
 
-OCI_IMAGE="docker.io/hwkcld/$IMAGE"
 OS_USER=appuser
 
 set -o pipefail
@@ -72,11 +80,13 @@ if [ "$HOST_MODE" = true ]; then
     echo "enable linger for ${OS_USER}"
     sudo loginctl enable-linger ${OS_USER}
 
-    sudo runuser -l ${OS_USER} -c "wget -O ~/setup-app.sh https://raw.githubusercontent.com/hwkcld/hwkapp/main/setup-app.sh && chmod 700 ~/setup-app.sh && ~/setup-app.sh -i ${OCI_IMAGE}"
+    sudo runuser -l ${OS_USER} -c "wget -O ~/setup-app.sh https://raw.githubusercontent.com/hwkcld/hwkapp/main/setup-app.sh && chmod 700 ~/setup-app.sh && ~/setup-app.sh -i ${IMAGE} -m ${MACHINE}"
 
     echo "Status: $?"
 
 else
+
+    OCI_IMAGE="docker.io/hwkcld/$IMAGE"
 
     podman pull docker.io/library/busybox
     if [[ $? -ne 0 ]]; then

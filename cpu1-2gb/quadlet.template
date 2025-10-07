@@ -7,11 +7,12 @@ Wants=network-online.target
 ContainerName=%CONTAINER_NAME%
 AutoUpdate=local
 Image=%OCI_IMAGE%
-Volume=%MOUNT_DATA%:/var/lib/postgresql/data
-Volume=%MOUNT_LOGS%:/var/log/postgresql
-Volume=%CONFIG_PATH%/postgresql.conf:/etc/postgresql/postgresql.conf
-PublishPort=127.0.0.1:5432:5432
-Exec=-c "config_file=/etc/postgresql/postgresql.conf"
+Volume=%MOUNT_DATA%:/opt/odoo-data
+Volume=%MOUNT_LOGS%:/var/log/odoo
+Volume=%CONFIG_PATH%/odoo.conf:/opt/odoo/odoo.conf
+PublishPort=8069:8069
+PublishPort=8071:8071
+PublishPort=8072:8072
 
 [Service]
 Restart=always
