@@ -88,13 +88,13 @@ else
 
     OCI_IMAGE="docker.io/hwkcld/$IMAGE"
 
-    podman pull --policy=newer docker.io/library/busybox
+    podman pull docker.io/library/busybox:latest
     if [[ $? -ne 0 ]]; then
         echo "Failed downloading busybox."
         exit 1
     fi
 
-    podman pull --policy=newer ${OCI_IMAGE}
+    podman pull ${OCI_IMAGE}
     if [[ $? -ne 0 ]]; then
         echo "Failed downloading ${OCI_IMAGE}."
         exit 1
