@@ -10,9 +10,7 @@ Image=%OCI_IMAGE%
 Volume=%MOUNT_DATA%:/opt/odoo-data
 Volume=%MOUNT_LOGS%:/var/log/odoo
 Volume=%CONFIG_PATH%/odoo.conf:/opt/odoo/odoo.conf
-PublishPort=8069:8069
-PublishPort=8071:8071
-PublishPort=8072:8072
+Network=host
 
 [Service]
 Restart=always
