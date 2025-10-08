@@ -8,7 +8,7 @@ MACHINE=""
 # Function to display usage
 usage() {
     echo
-    echo "Usage: $0 [-h] [-i image]"
+    echo "Usage: $0 [-h] [-i image] [-m machine]"
     echo "  -h          Specify script is run from host"
     echo "  -i image    Specify the image name"
     echo "  -m machine  Specify the machine name e.g. cpu1-2gb"
@@ -24,6 +24,7 @@ fi
 # Parse command-line options
 # h - flag with no argument
 # i: - option that requires an argument (the colon means "takes a value")
+# m: - option that requires an argument
 while getopts "hi:m:" opt; do
     case $opt in
         h)
@@ -61,10 +62,14 @@ if [ -z "$MACHINE" ]; then
 fi
 
 # Your script logic here
-# echo "Host: $HOST_MODE"
-# echo "Image: $IMAGE"
+#echo "Host: ${HOST_MODE}"
+#echo "Image: ${IMAGE}"
+#echo "Machine: ${MACHINE}"
 
 OS_USER=appuser
+REPO_SOURCE=https://raw.githubusercontent.com/hwkcld/hwkapp/main
+SETUP_SCR=setup-app.sh
+CTN_CONFIG=odoo.conf
 
 set -o pipefail
 
@@ -80,13 +85,13 @@ if [ "$HOST_MODE" = true ]; then
     echo "enable linger for ${OS_USER}"
     sudo loginctl enable-linger ${OS_USER}
 
-    sudo runuser -l ${OS_USER} -c "wget -O ~/setup-app.sh https://raw.githubusercontent.com/hwkcld/hwkapp/main/setup-app.sh && chmod 700 ~/setup-app.sh && ~/setup-app.sh -i ${IMAGE} -m ${MACHINE}"
+    sudo runuser -l ${OS_USER} -c "wget -O ~/${SETUP_SCR} ${REPO_SOURCE}/${SETUP_SCR} && chmod 700 ~/${SETUP_SCR} && ~/${SETUP_SCR} -i ${IMAGE} -m ${MACHINE}"
 
     echo "Status: $?"
 
 else
 
-    OCI_IMAGE="docker.io/hwkcld/$IMAGE"
+    OCI_IMAGE="docker.io/hwkcld/${IMAGE}"
 
     podman pull docker.io/library/busybox:latest
     if [[ $? -ne 0 ]]; then
@@ -122,11 +127,10 @@ else
     echo "Create directory for config files"
     mkdir -p ${CONFIG_PATH}
 
-    config_file=odoo.conf
-    echo "Download the default ${config_file}"
-    srcfile="https://raw.githubusercontent.com/hwkcld/hwkapp/main/${MACHINE}/${config_file}"
+    echo "Download the default ${CTN_CONFIG}"
+    srcfile="${REPO_SOURCE}/${MACHINE}/${CTN_CONFIG}"
 
-    wget -O ${CONFIG_PATH}/${config_file} ${srcfile}
+    wget -O ${CONFIG_PATH}/${CTN_CONFIG} ${srcfile}
     if [[ $? -ne 0 ]]; then
         echo "Error downloading ${srcfile}."
         exit 1
@@ -137,7 +141,7 @@ else
 
     quadlet_template=quadlet.template
     echo "Download the default ${quadlet_template}"
-    srcfile="https://raw.githubusercontent.com/hwkcld/hwkapp/main/${MACHINE}/${quadlet_template}"
+    srcfile="${REPO_SOURCE}/${MACHINE}/${quadlet_template}"
 
     quadlet_file=${QUADLET_PATH}/${CONTAINER_NAME}.container
     
