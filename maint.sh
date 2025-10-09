@@ -90,9 +90,11 @@ fi
 #echo "Update: ${UPDATE_ALL}"
 
 CMD_OPTIONS=""
+INTERACTIVE=""
 
 if [ "$ODOO_SHELL" = true ]; then
 	CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-- shell"
+	INTERACTIVE="-it "
 fi
 
 CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-d ${DATABASE}"
@@ -112,7 +114,8 @@ echo
 SKIP_ENTRY=""
 if [ "$CTN_SHELL" = true ]; then
     CMD_OPTIONS=""
-    SKIP_ENTRY="--entrypoint /bin/bash -it "
+    SKIP_ENTRY="--entrypoint /bin/bash"
+	INTERACTIVE="-it "	
 fi
 
 echo "ENTRYPOINT: ${SKIP_ENTRY}"
@@ -125,7 +128,7 @@ podman run \
 -v ${CONTAINER_NAME}-data:/opt/odoo-data \
 -v ${CONTAINER_NAME}-logs:/var/log/odoo \
 -v ./maint.conf:/opt/odoo/odoo.conf \
-${SKIP_ENTRY}\
+${SKIP_ENTRY}${INTERACTIVE}\
 docker.io/hwkcld/${IMAGE} \
 ${CMD_OPTIONS}
 
