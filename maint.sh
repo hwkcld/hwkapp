@@ -33,7 +33,7 @@ fi
 # c: - option that requires an argument (the colon means "takes a value")
 # d: - option that requires an argument
 # i: - option that requires an argument
-while getopts "uc:d:i:" opt; do
+while getopts "souc:d:i:" opt; do
     case $opt in
         s)
             CTN_SHELL=true
