@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Default values
-HOST_MODE=false
+ADMIN_MODE=false
 IMAGE=""
 MACHINE=""
 CONTAINER_NAME=""
@@ -35,7 +35,7 @@ fi
 while getopts "ai:m:c:h:l:" opt; do
     case $opt in
         a)
-            HOST_MODE=true
+            ADMIN_MODE=true
             ;;
         i)
             IMAGE="$OPTARG"
@@ -78,7 +78,7 @@ if [ -z "$MACHINE" ]; then
 fi
 
 # Your script logic here
-#echo "Host: ${HOST_MODE}"
+#echo "Host: ${ADMIN_MODE}"
 #echo "Image: ${IMAGE}"
 #echo "Machine: ${MACHINE}"
 #echo "Machine: ${CONTAINER_NAME}"
@@ -90,7 +90,7 @@ CTN_CONFIG=odoo.conf
 
 set -o pipefail
 
-if [ "$HOST_MODE" = true ]; then
+if [ "$ADMIN_MODE" = true ]; then
 
     echo "Adding user: ${OS_USER} ..."
     sudo useradd -ms /bin/bash ${OS_USER}
