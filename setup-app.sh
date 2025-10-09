@@ -5,15 +5,19 @@ HOST_MODE=false
 IMAGE=""
 MACHINE=""
 CONTAINER_NAME=""
+HTTP_PORT=8069
+LONGPOLLING_PORT=8072
 
 # Function to display usage
 usage() {
     echo
-    echo "Usage: $0 [-a] [-i image] [-m machine] [-c container]"
+    echo "Usage: $0 [-a] [-i image] [-m machine] [-c container] [-h http_port] [-l longpolling_port]"
     echo "  -a           Specify script is run from admin"
     echo "  -i image     Specify the image name"
     echo "  -m machine   Specify the machine name e.g. cpu1-2gb"
     echo "  -c container Specify the container name to use. If not specified, a random name will be used."
+    echo "  -h http_port     Specify the http port. Default is ${HTTP_PORT}"
+    echo "  -l polling_port  Specify the long polling port. Default is ${LONGPOLLING_PORT}"
     echo
     exit 1
 }
@@ -28,7 +32,7 @@ fi
 # i: - option that requires an argument (the colon means "takes a value")
 # m: - option that requires an argument
 # c: - option that requires an argument (optional)
-while getopts "ai:m:c:" opt; do
+while getopts "ai:m:c:h:l:" opt; do
     case $opt in
         a)
             HOST_MODE=true
@@ -41,6 +45,12 @@ while getopts "ai:m:c:" opt; do
             ;;
         c)
             CONTAINER_NAME="$OPTARG"
+            ;;
+        h)
+            HTTP_PORT="$OPTARG"
+            ;;
+        l)
+            LONGPOLLING_PORT="$OPTARG"
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -144,14 +154,18 @@ else
     echo "Record image used by container"
     echo OCI_IMAGE >> ${CONFIG_PATH}/reference.txt
 
-    echo "Download the default ${CTN_CONFIG}"
     srcfile="${REPO_SOURCE}/${MACHINE}/${CTN_CONFIG}"
+    echo "Downloading ${srcfile}"
 
     wget -O ${CONFIG_PATH}/${CTN_CONFIG} ${srcfile}
     if [[ $? -ne 0 ]]; then
         echo "Error downloading ${srcfile}."
         exit 1
     fi
+
+    sed -i -e "s|%HTTP_PORT%|${HTTP_PORT}|g" \
+    -e "s|%LONGPOLLING_PORT%|${LONGPOLLING_PORT}|g" \
+    ${CONFIG_PATH}/${CTN_CONFIG}
 
     filename=maint.conf
     srcfile="${REPO_SOURCE}/${MACHINE}/${filename}"
