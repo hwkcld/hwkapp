@@ -70,6 +70,7 @@ OS_USER=appuser
 REPO_SOURCE=https://raw.githubusercontent.com/hwkcld/hwkapp/main
 SETUP_SCR=setup-app.sh
 CTN_CONFIG=odoo.conf
+MAINT_CONFIG=maintenance.conf
 
 set -o pipefail
 
@@ -131,6 +132,15 @@ else
     srcfile="${REPO_SOURCE}/${MACHINE}/${CTN_CONFIG}"
 
     wget -O ${CONFIG_PATH}/${CTN_CONFIG} ${srcfile}
+    if [[ $? -ne 0 ]]; then
+        echo "Error downloading ${srcfile}."
+        exit 1
+    fi
+
+    echo "Download the default ${MAINT_CONFIG}"
+    srcfile="${REPO_SOURCE}/${MACHINE}/${MAINT_CONFIG}"
+
+    wget -O ${CONFIG_PATH}/${MAINT_CONFIG} ${srcfile}
     if [[ $? -ne 0 ]]; then
         echo "Error downloading ${srcfile}."
         exit 1
