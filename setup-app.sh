@@ -70,7 +70,6 @@ OS_USER=appuser
 REPO_SOURCE=https://raw.githubusercontent.com/hwkcld/hwkapp/main
 SETUP_SCR=setup-app.sh
 CTN_CONFIG=odoo.conf
-MAINT_CONFIG=maintenance.conf
 
 set -o pipefail
 
@@ -137,14 +136,26 @@ else
         exit 1
     fi
 
-    echo "Download the default ${MAINT_CONFIG}"
-    srcfile="${REPO_SOURCE}/${MACHINE}/${MAINT_CONFIG}"
+    filename=maint.conf
+    srcfile="${REPO_SOURCE}/${MACHINE}/${filename}"
+    echo "Downloading ${srcfile}"
 
-    wget -O ${CONFIG_PATH}/${MAINT_CONFIG} ${srcfile}
+    wget -O ${HOME}/${filename} ${srcfile}
     if [[ $? -ne 0 ]]; then
         echo "Error downloading ${srcfile}."
         exit 1
     fi
+
+    filename=maint.sh
+    srcfile="${REPO_SOURCE}/${filename}"
+    echo "Downloading ${srcfile}"
+
+    wget -O ${HOME}/${filename} ${srcfile}
+    if [[ $? -ne 0 ]]; then
+        echo "Error downloading ${srcfile}."
+        exit 1
+    fi
+    chmod 700 ${HOME}/${filename}
 
     echo "Create directory for quadlet"
     mkdir -p ${QUADLET_PATH}
