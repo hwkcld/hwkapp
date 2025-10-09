@@ -152,7 +152,7 @@ else
     mkdir -p ${CONFIG_PATH}
 
     echo "Record image used by container"
-    echo ${OCI_IMAGE} >> ${CONFIG_PATH}/reference.txt
+    echo $(date +"%Y-%m-%d %H:%M:%S") ${OCI_IMAGE} >> ${CONFIG_PATH}/reference.txt
 
     srcfile="${REPO_SOURCE}/${MACHINE}/${CTN_CONFIG}"
     echo "Downloading ${srcfile}"
