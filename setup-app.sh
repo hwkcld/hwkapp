@@ -127,6 +127,9 @@ else
     echo "Create directory for config files"
     mkdir -p ${CONFIG_PATH}
 
+	echo "Record image used by container"
+	echo OCI_IMAGE >> ${CONFIG_PATH}/reference.txt
+
     echo "Download the default ${CTN_CONFIG}"
     srcfile="${REPO_SOURCE}/${MACHINE}/${CTN_CONFIG}"
 
