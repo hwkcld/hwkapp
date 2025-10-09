@@ -3,6 +3,8 @@
 set -e
 
 # Default values
+CTN_SHELL=false
+ODOO_SHELL=false
 UPDATE_ALL=false
 CONTAINER_NAME=""
 DATABASE=""
@@ -11,11 +13,13 @@ IMAGE=""
 # Function to display usage
 usage() {
     echo
-    echo "Usage: $0 [-c container] [-d database] [-i image] [-u]"
+    echo "Usage: $0 [-c container] [-d database] [-i image] [-s|-o] [-u]"
     echo "  -c container Specify the container name or ID"
     echo "  -d database  Specify the database to use"
     echo "  -i image     Specify the image name to use"
-    echo "  -u           Specify if it is an update of all the modules"
+    echo "  -s           Run into container shell"
+    echo "  -o           Run into odoo shell"
+    echo "  -u           Run with update of all the modules"
     echo
     exit 1
 }
@@ -31,6 +35,12 @@ fi
 # i: - option that requires an argument
 while getopts "uc:d:i:" opt; do
     case $opt in
+        s)
+            CTN_SHELL=true
+            ;;
+        o)
+            ODOO_SHELL=true
+            ;;
         u)
             UPDATE_ALL=true
             ;;
@@ -79,9 +89,16 @@ fi
 #echo "Image: ${IMAGE}"
 #echo "Update: ${UPDATE_ALL}"
 
-CMD_OPTIONS="-d ${DATABASE}"
+CMD_OPTIONS=""
+
+if [ "$ODOO_SHELL" = true ]; then
+	CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}shell"
+fi
+
+CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-d ${DATABASE}"
+
 if [ "$UPDATE_ALL" = true ]; then
-    CMD_OPTIONS="-d ${DATABASE} -u all"
+    CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-u all"
 fi
 
 if [ "$UPDATE_ALL" = true ]; then
@@ -91,13 +108,24 @@ fi
 
 echo "Running update for database: ${DATABASE} with image: ${IMAGE}"
 echo
+
+SKIP_ENTRY=""
+if [ "$CTN_SHELL" = true ]; then
+    CMD_OPTIONS=""
+    SKIP_ENTRY="--entrypoint /bin/bash -it "
+fi
+
+echo "ENTRYPOINT: ${SKIP_ENTRY}"
+echo "CMD: ${CMD_OPTIONS}"
+
 podman run \
 --rm \
 --name ${CONTAINER_NAME} \
 --network=host \
 -v ${CONTAINER_NAME}-data:/opt/odoo-data \
 -v ${CONTAINER_NAME}-logs:/var/log/odoo \
--v ./${CONTAINER_NAME}/maintenance.conf:/opt/odoo/odoo.conf \
+-v ./maint.conf:/opt/odoo/odoo.conf \
+${SKIP_ENTRY}\
 docker.io/hwkcld/${IMAGE} \
 ${CMD_OPTIONS}
 
