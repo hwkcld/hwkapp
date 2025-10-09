@@ -210,7 +210,7 @@ else
     ${quadlet_file}
 
     echo "Record image used by container"
-    echo $(date +"%Y-%m-%d %H:%M:%S") ${OCI_IMAGE} http:${HTTP_PORT} poll:${LONGPOLLING_PORT} >> ${CONFIG_PATH}/reference.txt
+    echo $(date +"%Y-%m-%d %H:%M:%S") ${OCI_IMAGE} >> ${CONFIG_PATH}/reference.txt
 
     echo "Create the ${CONTAINER_NAME} service"
     systemctl --user daemon-reload
