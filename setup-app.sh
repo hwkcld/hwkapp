@@ -151,9 +151,6 @@ else
     echo "Create directory for config files"
     mkdir -p ${CONFIG_PATH}
 
-    echo "Record image used by container"
-    echo $(date +"%Y-%m-%d %H:%M:%S") ${OCI_IMAGE} >> ${CONFIG_PATH}/reference.txt
-
     srcfile="${REPO_SOURCE}/${MACHINE}/${CTN_CONFIG}"
     echo "Downloading ${srcfile}"
 
@@ -208,7 +205,12 @@ else
     -e "s|%MOUNT_DATA%|${MOUNT_DATA}|g" \
     -e "s|%MOUNT_LOGS%|${MOUNT_LOGS}|g" \
     -e "s|%CONFIG_PATH%|${CONFIG_PATH}|g" \
+    -e "s|%HTTP_PORT%|${HTTP_PORT}|g" \
+    -e "s|%LONGPOLLING_PORT%|${LONGPOLLING_PORT}|g" \
     ${quadlet_file}
+
+    echo "Record image used by container"
+    echo $(date +"%Y-%m-%d %H:%M:%S") ${OCI_IMAGE} http:${HTTP_PORT} poll:${LONGPOLLING_PORT} >> ${CONFIG_PATH}/reference.txt
 
     echo "Create the ${CONTAINER_NAME} service"
     systemctl --user daemon-reload
