@@ -123,7 +123,7 @@ echo "CMD: ${CMD_OPTIONS}"
 
 podman run \
 --rm \
---name ${CONTAINER_NAME} \
+--name maint \
 --network=host \
 -v ${CONTAINER_NAME}-data:/opt/odoo-data \
 -v ${CONTAINER_NAME}-logs:/var/log/odoo \
