@@ -4,14 +4,16 @@
 HOST_MODE=false
 IMAGE=""
 MACHINE=""
+CONTAINER_NAME=""
 
 # Function to display usage
 usage() {
     echo
-    echo "Usage: $0 [-a] [-i image] [-m machine]"
-    echo "  -a          Specify script is run from admin"
-    echo "  -i image    Specify the image name"
-    echo "  -m machine  Specify the machine name e.g. cpu1-2gb"
+    echo "Usage: $0 [-a] [-i image] [-m machine] [-c container]"
+    echo "  -a           Specify script is run from admin"
+    echo "  -i image     Specify the image name"
+    echo "  -m machine   Specify the machine name e.g. cpu1-2gb"
+    echo "  -c container Specify the container name to use. If not specified, a random name will be used."
     echo
     exit 1
 }
@@ -25,7 +27,8 @@ fi
 # a - flag with no argument
 # i: - option that requires an argument (the colon means "takes a value")
 # m: - option that requires an argument
-while getopts "ai:m:" opt; do
+# c: - option that requires an argument (optional)
+while getopts "ai:m:c:" opt; do
     case $opt in
         a)
             HOST_MODE=true
@@ -35,6 +38,9 @@ while getopts "ai:m:" opt; do
             ;;
         m)
             MACHINE="$OPTARG"
+            ;;
+        c)
+            CONTAINER_NAME="$OPTARG"
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -65,6 +71,7 @@ fi
 #echo "Host: ${HOST_MODE}"
 #echo "Image: ${IMAGE}"
 #echo "Machine: ${MACHINE}"
+#echo "Machine: ${CONTAINER_NAME}"
 
 OS_USER=appuser
 REPO_SOURCE=https://raw.githubusercontent.com/hwkcld/hwkapp/main
@@ -85,7 +92,12 @@ if [ "$HOST_MODE" = true ]; then
     echo "enable linger for ${OS_USER}"
     sudo loginctl enable-linger ${OS_USER}
 
-    sudo runuser -l ${OS_USER} -c "wget -O ~/${SETUP_SCR} ${REPO_SOURCE}/${SETUP_SCR} && chmod 700 ~/${SETUP_SCR} && ~/${SETUP_SCR} -i ${IMAGE} -m ${MACHINE}"
+    CONTAINER_ARG=""
+    if [[ -n "$CONTAINER_NAME" ]]; then
+        CONTAINER_ARG="-c ${CONTAINER_NAME}"
+    fi
+    
+    sudo runuser -l ${OS_USER} -c "wget -O ~/${SETUP_SCR} ${REPO_SOURCE}/${SETUP_SCR} && chmod 700 ~/${SETUP_SCR} && ~/${SETUP_SCR} -i ${IMAGE} -m ${MACHINE} ${CONTAINER_ARG}"
 
     echo "Status: $?"
 
@@ -105,10 +117,12 @@ else
         exit 1
     fi
 
-    # Get unique name for new container from podman
-    podman run -d busybox \
-        && CONTAINER_NAME=$(podman ps -a --filter "ancestor=busybox:latest" --sort created --format "{{.Names}}" | tail -1) \
-        && podman rm ${CONTAINER_NAME}
+    if [ -z "$CONTAINER_NAME" ]; then
+        # Get unique name for new container from podman
+        podman run -d busybox \
+            && CONTAINER_NAME=$(podman ps -a --filter "ancestor=busybox:latest" --sort created --format "{{.Names}}" | tail -1) \
+            && podman rm ${CONTAINER_NAME}
+    fi
 
     MOUNT_DATA=${CONTAINER_NAME}-data
     MOUNT_LOGS=${CONTAINER_NAME}-logs

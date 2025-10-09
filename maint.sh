@@ -93,8 +93,8 @@ CMD_OPTIONS=""
 INTERACTIVE=""
 
 if [ "$ODOO_SHELL" = true ]; then
-	CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-- shell"
-	INTERACTIVE="-it "
+    CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-- shell"
+    INTERACTIVE="-it "
 fi
 
 CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-d ${DATABASE}"
@@ -115,7 +115,7 @@ SKIP_ENTRY=""
 if [ "$CTN_SHELL" = true ]; then
     CMD_OPTIONS=""
     SKIP_ENTRY="--entrypoint /bin/bash"
-	INTERACTIVE="-it "	
+    INTERACTIVE="-it "  
 fi
 
 echo "ENTRYPOINT: ${SKIP_ENTRY}"
