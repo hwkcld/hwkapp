@@ -92,7 +92,7 @@ fi
 CMD_OPTIONS=""
 
 if [ "$ODOO_SHELL" = true ]; then
-	CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}shell"
+	CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-- shell"
 fi
 
 CMD_OPTIONS="${CMD_OPTIONS}${CMD_OPTIONS:+" "}-d ${DATABASE}"
