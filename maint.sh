@@ -13,8 +13,8 @@ IMAGE=""
 # Function to display usage
 usage() {
     echo
-    echo "Usage: $0 [-c container] [-d database] [-i image] [-s|-o] [-u]"
-    echo "  -c container Specify the container name or ID"
+    echo "Usage: $0 -c container -d database -i image [-s|-o] [-u]"
+    echo "  -c container Specify the container's volume to access"
     echo "  -d database  Specify the database to use"
     echo "  -i image     Specify the image name to use"
     echo "  -s           Run into container shell"

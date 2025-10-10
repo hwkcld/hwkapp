@@ -11,8 +11,8 @@ LONGPOLLING_PORT=8072
 # Function to display usage
 usage() {
     echo
-    echo "Usage: $0 [-a] [-i image] [-m machine] [-c container] [-h http_port] [-l longpolling_port]"
-    echo "  -a           Specify script is run from admin"
+    echo "Usage: $0 -i image -m machine [-a] [-c container] [-h http_port] [-l longpolling_port]"
+    echo "  -a           Specify script is run from admin. Usually for first time setup."
     echo "  -i image     Specify the image name"
     echo "  -m machine   Specify the machine name e.g. cpu1-2gb"
     echo "  -c container Specify the container name to use. If not specified, a random name will be used."
