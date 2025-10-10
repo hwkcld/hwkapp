@@ -185,6 +185,17 @@ else
     fi
     chmod 700 ${HOME}/${filename}
 
+    filename=checkconfig.sh
+    srcfile="${REPO_SOURCE}/${filename}"
+    echo "Downloading ${srcfile}"
+
+    wget -O ${HOME}/${filename} ${srcfile}
+    if [[ $? -ne 0 ]]; then
+        echo "Error downloading ${srcfile}."
+        exit 1
+    fi
+    chmod 700 ${HOME}/${filename}
+
     echo "Create directory for quadlet"
     mkdir -p ${QUADLET_PATH}
 
