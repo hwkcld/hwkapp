@@ -114,7 +114,7 @@ echo
 SKIP_ENTRY=""
 if [ "$CTN_SHELL" = true ]; then
     CMD_OPTIONS=""
-    SKIP_ENTRY="--entrypoint /bin/bash"
+    SKIP_ENTRY="--entrypoint /bin/bash "
     INTERACTIVE="-it "  
 fi
 
